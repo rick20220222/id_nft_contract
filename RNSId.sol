@@ -150,12 +150,9 @@ contract RNSId is
     payable(destination).transfer(address(this).balance);
   }
 
-  function supportsInterface(bytes4 _interfaceId)
-    public
-    view
-    override(ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable)
-    returns (bool)
-  {
+  function supportsInterface(
+    bytes4 _interfaceId
+  ) public view override(ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable) returns (bool) {
     return super.supportsInterface(_interfaceId);
   }
 
@@ -165,24 +162,13 @@ contract RNSId is
   }
 
   function _beforeTokenTransfer(
-    address from,
-    address to,
-    uint256 tokenId
-  ) internal override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
+    address from, address to, uint256 firstTokenId, uint256 batchSize
+) internal virtual override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
     if (from != address(0)) {
-      address owner = ownerOf(tokenId);
-      require(owner == msg.sender, 'Only the owner of NFT can transfer or burn it');
-      require(to == address(0) || from == address(0), 'an RnsID NFT can only be airdropped or burned');
+        address owner = ownerOf(firstTokenId);
+        require(owner == msg.sender, 'Only the owner of NFT can transfer or burn it');
+        require(to == address(0) || from == address(0), 'an RnsID NFT can only be airdropped or burned');
     }
-    super._beforeTokenTransfer(from, to, tokenId);
-  }
-
-  function _beforeConsecutiveTokenTransfer(
-    address from,
-    address to,
-    uint256, /*first*/
-    uint96 size
-  ) internal override(ERC721Upgradeable, ERC721EnumerableUpgradeable) {
-    super._beforeConsecutiveTokenTransfer(from, to, 0, size);
-  }
+    super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
+}
 }
